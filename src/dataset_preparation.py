@@ -7,6 +7,8 @@ from rich.console import Console
 from rich.progress import track
 import yaml
 import random
+from config import config
+from typing import Optional
 
 
 # Configuration
@@ -14,9 +16,9 @@ DATASET_PATH = Path(r"D:\Programmation\Python\tps\mlops-end-to-end\data\THE-data
 console = Console()
 
 client = Client(
-    api_token="8a488fe5b5aca2809dd6e7ef7ba00bc6d7b2095d",
-    organization_name="Picsalex-MLOps",
-    host="https://app.picsellia.com",
+    api_token=config.api_token,
+    organization_name=config.organization_name,
+    host=config.host,
 )
 
 
@@ -46,7 +48,7 @@ def ensure_annotations_present(dataset_path: Path) -> bool:
 
 def ensure_annotations_downloaded(
     dataset_path: Path, dataset_version: DatasetVersion
-) -> Path:
+) -> Optional[Path]:
     """Download annotations if not already present"""
     annotation_file = dataset_path / "annotations.zip"
     if not ensure_annotations_present(dataset_path):
@@ -55,7 +57,8 @@ def ensure_annotations_downloaded(
             annotation_file_type=AnnotationFileType.YOLO,
             target_path=str(dataset_path),
         )
-    return annotation_file
+        return annotation_file
+    return None
 
 
 def extract_annotations(annotation_file: str, dataset_path: Path):
@@ -108,6 +111,9 @@ def split_dataset(
 
     # Calculate split indices
     n_images = len(image_files)
+    if n_images == 0:
+        console.log("[red]No images found in the dataset no spliting...[/]")
+        return None
     n_train = int(n_images * train_ratio)
     n_valid = int(n_images * valid_ratio)
 

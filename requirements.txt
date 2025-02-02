@@ -4,3 +4,4 @@ picsellia
 rich
 ultralytics
 pip
+python-dotenv
