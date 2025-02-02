@@ -46,7 +46,7 @@ def ensure_annotations_present(dataset_path: Path) -> bool:
 
 def ensure_annotations_downloaded(
     dataset_path: Path, dataset_version: DatasetVersion
-) -> str:
+) -> Path:
     """Download annotations if not already present"""
     annotation_file = dataset_path / "annotations.zip"
     if not ensure_annotations_present(dataset_path):
@@ -55,8 +55,7 @@ def ensure_annotations_downloaded(
             annotation_file_type=AnnotationFileType.YOLO,
             target_path=str(dataset_path),
         )
-        return annotation_file
-    return ""
+    return annotation_file
 
 
 def extract_annotations(annotation_file: str, dataset_path: Path):
