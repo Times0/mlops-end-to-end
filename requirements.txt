@@ -1,2 +1,5 @@
 requests
 pre-commit
+picsellia
+rich
+yaml
