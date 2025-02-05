@@ -13,13 +13,9 @@ class Config:
         if not self.api_token:
             raise ValueError("PICSELIA_API_TOKEN environment variable is not set")
 
-        self.organization_name = os.environ.get("PICSELIA_ORGANIZATION_NAME")
-        if not self.organization_name:
-            raise ValueError(
-                "PICSELIA_ORGANIZATION_NAME environment variable is not set"
-            )
-
-        self.host = "https://app.picsellia.com"  # If host changes, we need to redo everython so no need for env var
+        self.ORG_NAME = "Picsalex-MLOps"
+        self.HOST = "https://app.picsellia.com"  # If host changes, we need to redo everython so no need for env var
+        self.DATASET_ID = "0194d124-1c5f-7d01-a532-be8aeebf59e8"
 
 
 # why use a class?

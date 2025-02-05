@@ -12,13 +12,13 @@ from typing import Optional
 
 
 # Configuration
-DATASET_PATH = Path(r"D:\Programmation\Python\tps\mlops-end-to-end\data\THE-dataset")
+DATASET_PATH = Path(r"data\THE-dataset")
 console = Console()
 
 client = Client(
     api_token=config.api_token,
-    organization_name=config.organization_name,
-    host=config.host,
+    organization_name=config.ORG_NAME,
+    host=config.HOST,
 )
 
 
@@ -173,8 +173,8 @@ def create_yaml_yolo(dataset_path: Path, classes: list):
 
 def main():
     console.log("[bold blue]Starting dataset preparation...[/]")
-
-    dataset: Dataset = client.get_dataset("tps-product-2025")
+    print(client.list_datasets())
+    dataset: Dataset = client.get_dataset_by_id(config.DATASET_ID)
     dataset_version: DatasetVersion = dataset.get_version("initial")
 
     # Downloading
