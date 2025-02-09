@@ -5,3 +5,5 @@ rich
 ultralytics
 pip
 python-dotenv
+picsellia
+mlflow

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     mlflow.set_experiment("YOLO_Training")
 
     cwd = Path.cwd()
-    path = cwd.parent / "data" / "THE-dataset"
+    path = cwd / "data" / "THE-dataset"
 
     with mlflow.start_run():
         model = YOLO("yolo11n")

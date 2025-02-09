@@ -12,7 +12,7 @@ from typing import Optional
 
 
 # Configuration
-DATASET_PATH = Path(r"data\THE-dataset")
+DATASET_PATH = Path(r"data/THE-dataset")
 console = Console()
 
 client = Client(

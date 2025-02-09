@@ -1,4 +1,7 @@
 data
+mlartifacts
+mlruns
+runs
 \.*
 *.pt
 __pycache__
