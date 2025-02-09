@@ -1,0 +1,64 @@
+services:
+  mysql-db:
+    image: mysql:8.2
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - .env
+    networks:
+      - ml_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
+    entrypoint: ["minio", "server", "--console-address", "0.0.0.0:9001", "/data"]
+    networks:
+      - ml_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_artifacts:/mlflow/mlruns
+    env_file:
+      - .env
+    networks:
+      - ml_network
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  minio_data:
+  mlflow_artifacts:
+
+networks:
+  ml_network:
+    driver: bridge 

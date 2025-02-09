@@ -3,9 +3,10 @@ from ultralytics import YOLO
 from pathlib import Path
 import mlflow
 from ultralytics import settings
+import boto3
 
 ## IMPORTANT ##
-# Start mlflow before using `mlflow server --host 0.0.0.0 --port 5000`
+# Start infrastructure before using `docker-compose up`
 
 # Update a setting
 settings.update({"mlflow": True})
@@ -13,9 +14,30 @@ settings.update({"mlflow": True})
 EPOCHS = 4
 DATASET_PATH = "data/THE-dataset"
 
-
 if __name__ == "__main__":
     mlflow.set_tracking_uri("http://localhost:5000")
+    
+    # Configure MLflow to use MinIO
+    os.environ['MLFLOW_S3_ENDPOINT_URL'] = "http://localhost:9000"
+    os.environ['AWS_ACCESS_KEY_ID'] = "minioadmin"
+    os.environ['AWS_SECRET_ACCESS_KEY'] = "minioadmin"
+    
+    # Create the mlflow bucket in MinIO if it doesn't exist
+    s3_client = boto3.client(
+        's3',
+        endpoint_url="http://localhost:9000",
+        aws_access_key_id="minioadmin",
+        aws_secret_access_key="minioadmin",
+        aws_session_token=None,
+        config=boto3.session.Config(signature_version='s3v4'),
+        verify=False
+    )
+    
+    try:
+        s3_client.head_bucket(Bucket='mlflow')
+    except:
+        s3_client.create_bucket(Bucket='mlflow')
+    
     mlflow.set_experiment("YOLO_Training")
 
     cwd = Path.cwd()

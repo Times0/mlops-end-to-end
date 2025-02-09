@@ -2,10 +2,7 @@
 
 https://app.picsellia.com/
 
-Create a `.env` file at the root of the project with the following content:
-```
-PICSELIA_API_TOKEN = "your-api-token"
-```
+Create a `.env` file at the root of the project with the provided environment variables.
 
 Starting
 
@@ -14,15 +11,17 @@ uv venv --python 3.11 .venv
 uv pip install -r requirements.txt
 ```
 
-launch mlflow server
-On another terminal:
+Launch the MLflow infrastructure on another terminal:
 ```
-source .venv/bin/activate
-mlflow server --host 0.0.0.0 --port 5000
+docker-compose up
 ```
+(or with '-d' to run in background)
 
 Now run the scripts:
 ```
 uv run src/dataset_preparation.py # download dataset / prepare dataset for training
 uv run src/training.py # start training with ultralytics
 ```
+
+The MLflow UI will be available at http://localhost:5001
+MinIO console will be available at http://localhost:9001

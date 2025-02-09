@@ -7,3 +7,5 @@ pip
 python-dotenv
 picsellia
 mlflow
+boto3
+pymysql
