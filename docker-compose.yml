@@ -1,8 +1,8 @@
 services:
   mysql-db:
     image: mysql:8.2
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
+    #command: --default-authentication-plugin=mysql_native_password
+    #restart: always
     ports:
       - "3306:3306"
     volumes:
@@ -11,11 +11,11 @@ services:
       - .env
     networks:
       - ml_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    #healthcheck:
+    #  test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    #  interval: 10s
+    #  timeout: 5s
+    #  retries: 5
 
   minio:
     image: minio/minio:latest
@@ -30,11 +30,11 @@ services:
     entrypoint: ["minio", "server", "--console-address", "0.0.0.0:9001", "/data"]
     networks:
       - ml_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+    #healthcheck:
+    #  test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #  interval: 30s
+    #  timeout: 20s
+    #  retries: 3
 
   mlflow:
     build:
@@ -49,10 +49,12 @@ services:
     networks:
       - ml_network
     depends_on:
-      mysql-db:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
+      - mysql-db
+      - minio
+      #mysql-db:
+        #condition: service_healthy
+      #minio:
+        #condition: service_healthy
 
 volumes:
   mysql_data:
