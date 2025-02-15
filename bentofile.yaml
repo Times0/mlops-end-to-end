@@ -1,0 +1,22 @@
+service: "service:YOLOService"
+
+include:
+  - "service.py"
+
+python:
+  packages:
+    - mlflow
+    - ultralytics
+    - torch
+    - pillow
+    - numpy
+    - opencv-python
+
+docker:
+  system_packages:
+    - libgl1-mesa-glx
+    - libglib2.0-0
+    - wget
+  env:
+    - "MODEL_NAME=yolo11n.pt"
+    - "MODEL_WEIGHTS_PATH=ultralytics/weights"

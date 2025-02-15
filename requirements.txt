@@ -1,0 +1,12 @@
+requests
+pre-commit
+picsellia
+rich
+ultralytics
+pip
+python-dotenv
+picsellia
+mlflow
+boto3
+pymysql
+bentoml

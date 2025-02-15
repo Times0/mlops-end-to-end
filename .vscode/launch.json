@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Start training.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/training.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/src/config/.env",
+            "env": {
+                "MLFLOW_S3_ENDPOINT_URL": "http://localhost:9000"
+            },
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Python: Start inference_bento.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/inference_bento.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/src/config/.env", //no need to overload the mlflow s3 endpoint here
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Python: Start inference_local.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/inference_local.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/src/config/.env",
+            "env": {
+                "MLFLOW_S3_ENDPOINT_URL": "http://localhost:9000"
+            },
+            "python": "${workspaceFolder}/.venv/bin/python"
+        }
+    ]
+}

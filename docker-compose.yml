@@ -1,0 +1,43 @@
+services:
+  mysql-db:
+    image: mysql:8.2
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - src/config/.env
+    networks:
+      - tps
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    entrypoint: [ "minio", "server", "--console-address", "0.0.0.0:9001", "/data" ]
+    networks:
+      - tps
+
+  mlflow:
+    image: mlflow-local-server:1.0
+    ports:
+      - "5001:5000"
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    env_file:
+      - src/config/.env
+    networks:
+      - tps
+    depends_on:
+      - mysql-db
+
+volumes:
+  minio_data:
+  mysql_data:
+
+networks:
+  tps:
