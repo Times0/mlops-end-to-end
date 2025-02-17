@@ -36,6 +36,19 @@
                 "MLFLOW_S3_ENDPOINT_URL": "http://localhost:9000"
             },
             "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "Python: Start inference_test.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/inference_test.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/src/config/.env",
+            "env": {
+                "MLFLOW_S3_ENDPOINT_URL": "http://localhost:9000"
+            },
+            "python": "${workspaceFolder}/.venv/bin/python"
         }
     ]
 }

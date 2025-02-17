@@ -10,3 +10,4 @@ mlflow
 boto3
 pymysql
 bentoml
+minio
