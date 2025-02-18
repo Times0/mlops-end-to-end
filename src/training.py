@@ -76,49 +76,35 @@ class Trainer:
         """
         run_id = mlflow.last_active_run().info.run_id
 
-        model_version = mlflow.register_model(
-            model_uri=f"runs:/{run_id}/weights/best.pt", name=self.model_name
-        )
+        model_version = mlflow.register_model(model_uri=f"runs:/{run_id}/weights/best.pt", name=self.model_name)
 
         client = MlflowClient()
 
         champion_version = None
         try:  # Try to get the champion version
-            champion_version = client.get_model_version_by_alias(
-                self.model_name, "Champion"
-            )
+            champion_version = client.get_model_version_by_alias(self.model_name, "Champion")
         except Exception:
             console.print("Couldn't get champion. Current model will be crowned")
             pass
 
         if champion_version is None:
-            client.set_registered_model_alias(
-                name=self.model_name, alias="Champion", version=model_version.version
-            )
-            client.set_registered_model_tag(
-                name=self.model_name, key="status", value="Champion"
-            )
+            client.set_registered_model_alias(name=self.model_name, alias="Champion", version=model_version.version)
+            client.set_registered_model_tag(name=self.model_name, key="status", value="Champion")
         else:
             current_metrics = mlflow.get_run(run_id).data.metrics
             champion_metrics = mlflow.get_run(champion_version.run_id).data.metrics
 
             console.print(f"current : {current_metrics}\nchampion : {champion_metrics}")
             if current_metrics.get(KEY_METRIC, 0) > champion_metrics.get(KEY_METRIC, 0):
-                console.print(
-                    "[green]Current model is better than champion: setting alias Challenger[/]"
-                )
+                console.print("[green]Current model is better than champion: setting alias Challenger[/]")
                 client.set_registered_model_alias(
                     name=self.model_name,
                     alias="Challenger",
                     version=model_version.version,
                 )
-                client.set_registered_model_tag(
-                    name=self.model_name, key="status", value="Challenger"
-                )
+                client.set_registered_model_tag(name=self.model_name, key="status", value="Challenger")
             else:
-                console.print(
-                    "[green]Current model is worse than champion: not setting alias[/]"
-                )
+                console.print("[green]Current model is worse than champion: not setting alias[/]")
 
 
 if __name__ == "__main__":
@@ -128,9 +114,7 @@ if __name__ == "__main__":
     epochs = int(os.getenv("EPOCHS", 3))
     model_name = os.getenv("MODEL", "yolo11n")
 
-    train = Trainer(
-        model_name=model_name, data_yaml=data_yaml, yolo_dir=yolo_dir, device=device
-    )
+    train = Trainer(model_name=model_name, data_yaml=data_yaml, yolo_dir=yolo_dir, device=device)
 
     train.train_model(epochs)
     train.register_model()
