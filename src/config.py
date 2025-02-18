@@ -2,7 +2,7 @@ import os
 import dotenv
 
 # Load .env file and check if it was successful
-if not dotenv.load_dotenv("src/config/.env"):
+if not dotenv.load_dotenv():
     raise RuntimeError("Failed to load .env file")
 
 

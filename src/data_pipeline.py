@@ -162,21 +162,68 @@ def create_yaml_yolo(dataset_path: Path, classes: list):
     console.log("[green]YAML file created![/]")
 
 
+def validate_dataset(dataset_path: Path):
+    """Validation part of the pipeline, checking if :
+    - The dataset is correctly structured (images and labels folders)
+    - Each image has a corresponding label file
+    - The labels are correctly formatted
+    """
+    console.log("[yellow]Validating dataset...[/]")
+    errors = 0
+    warnings = 0
+    for split in ["train", "valid", "test"]:
+        images_path = dataset_path / split / "images"
+        labels_path = dataset_path / split / "labels"
+
+        # Check if images and labels folders exist
+        if not images_path.exists() or not labels_path.exists():
+            console.log(f"[red]Images or labels folder not found for {split} split[/]")
+            errors += 1
+            continue
+
+        # Check if each image has a corresponding label file
+        images = set(img.stem for img in images_path.glob("*.jpg"))
+        labels = set(label.stem for label in labels_path.glob("*.txt"))
+        missing_labels = images - labels
+        if missing_labels:
+            console.log(f"[yellow](warning) {len(missing_labels)} images are missing label files in {split} split[/]")
+            warnings += len(missing_labels)
+
+        # Check if labels are correctly formatted
+        for label_file in labels_path.glob("*.txt"):
+            with open(label_file, "r") as f:
+                lines = f.readlines()
+            for line in lines:
+                parts = line.strip().split()
+                if len(parts) != 5:
+                    console.log(f"[red]Incorrect format in {label_file.name}[/]")
+                    errors += 1
+                    break
+
+    if errors == 0:
+        console.log("[green]Dataset validation successful![/]")
+    else:
+        console.log(f"[red]{errors} errors found in the dataset[/]")
+
+
 def main():
-    console.log("[bold blue]Starting dataset preparation...[/]")
+    console.log("[bold blue]Starting data pipeline...[/]")
     dataset: Dataset = client.get_dataset_by_id(config.DATASET_ID)
     dataset_version: DatasetVersion = dataset.get_version("initial")
 
-    # Downloading
-    ensure_dataset_downloaded(dataset_version, DATASET_PATH)  # PIPELINE ML : Data extraction
+    # PIPELINE ML 1 : Data extraction
+    ensure_dataset_downloaded(dataset_version, DATASET_PATH)
     annotation_file = ensure_annotations_downloaded(DATASET_PATH, dataset_version)
     if annotation_file:
         extract_annotations(annotation_file, DATASET_PATH)
 
-    # Preprocessing
+    # PIPELINE ML 2 : Data preparation
     split_dataset(DATASET_PATH, 0.6, 0.2)  # 60% train, 20% valid, 20% test
     classes = dataset_version.list_labels()
     create_yaml_yolo(DATASET_PATH, classes)
+
+    # PIPELINE ML 3 : Data validation
+    validate_dataset(DATASET_PATH)
 
 
 if __name__ == "__main__":
