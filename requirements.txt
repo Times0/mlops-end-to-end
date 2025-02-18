@@ -11,3 +11,4 @@ boto3
 pymysql
 bentoml
 minio
+boto3

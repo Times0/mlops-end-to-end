@@ -4,11 +4,11 @@ from mlflow import MlflowClient
 from ultralytics import YOLO
 from dotenv import load_dotenv
 from rich.console import Console
+import boto3
 from config import config
 
 load_dotenv()
 KEY_METRIC = "metrics/mAP50-95B"
-
 
 console = Console()
 
@@ -34,6 +34,29 @@ class Trainer:
         self.data_yaml = Path(data_yaml)
         self.yolo_dir = Path(yolo_dir)
         self.device = device
+        
+        os.makedirs(self.yolo_dir, exist_ok=True)
+
+        def setup_s3_client():
+            """
+            Creates the mlflow bucket in minio
+            """
+            s3_client = boto3.client(
+                's3',
+                endpoint_url=os.getenv('MLFLOW_S3_ENDPOINT_URL'),
+                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+            )
+            try:
+                s3_client.head_bucket(Bucket='mlflow')
+            except:
+                s3_client.create_bucket(Bucket='mlflow')
+        
+        setup_s3_client()
+
+
+
+    def train_model(self, epochs: int) -> None:
 
     def train_model(self) -> None:
         """
