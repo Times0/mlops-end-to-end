@@ -7,8 +7,8 @@ from rich.console import Console
 from rich.progress import track
 import yaml
 import random
-from src.config import config
 from typing import Optional
+from src.config import config
 
 
 # Configuration
