@@ -15,6 +15,7 @@ from typing import Optional
 DATASET_PATH = Path(r"data/THE-dataset")
 console = Console()
 
+# Login to Picsellia
 client = Client(
     api_token=config.api_token,
     organization_name=config.ORG_NAME,
@@ -173,7 +174,6 @@ def create_yaml_yolo(dataset_path: Path, classes: list):
 
 def main():
     console.log("[bold blue]Starting dataset preparation...[/]")
-    print(client.list_datasets())
     dataset: Dataset = client.get_dataset_by_id(config.DATASET_ID)
     dataset_version: DatasetVersion = dataset.get_version("initial")
 
@@ -184,7 +184,7 @@ def main():
         extract_annotations(annotation_file, DATASET_PATH)
 
     # Preprocessing
-    split_dataset(DATASET_PATH, 0.6, 0.2)
+    split_dataset(DATASET_PATH, 0.6, 0.2)  # 60% train, 20% valid, 20% test
     classes = dataset_version.list_labels()
     create_yaml_yolo(DATASET_PATH, classes)
 

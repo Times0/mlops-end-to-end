@@ -6,13 +6,11 @@ from ultralytics import YOLO
 from dotenv import load_dotenv
 from rich.console import Console
 
+load_dotenv()
 KEY_METRIC = "metrics/mAP50-95B"
 
 
 console = Console()
-
-# Load environment variables
-load_dotenv()
 
 
 class Trainer:
@@ -37,8 +35,6 @@ class Trainer:
         self.yolo_dir = Path(yolo_dir)
         self.device = device
 
-        self.yolo_dir.mkdir(parents=True, exist_ok=True)
-
     def train_model(self, epochs: int) -> None:
         """
         Trains the model configured in __init__.
@@ -55,11 +51,8 @@ class Trainer:
                 epochs=epochs,
                 device=self.device,
                 project=str(self.yolo_dir),  # dir to save runs
-                name="train",  # name of this run
-                exist_ok=True,  # overwrite existing files
                 close_mosaic=0,
                 seed=42,
-                imgsz=320,  # smaller image size
             )
 
             # upload weights
