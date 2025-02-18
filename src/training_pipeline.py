@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from rich.console import Console
 import boto3
 from config import config
-import os
 
 load_dotenv()
 KEY_METRIC = "metrics/mAP50-95B"
@@ -26,32 +25,26 @@ class Trainer:
         Initializes the trainer wraper.
 
         Args:
-            model_name (str): The name of the model.
+            model_name (str): The name of the model (e.g. yolo11n).
             data_yaml (str, Path): Path to the data yaml configuration file.
-            yolo_dir (str, Path): Directory where the model will be temporarily stored (overwriting past runs).
-            device (str, int): The device to run the model on. Either the device name or a number indicating which GPU to use
+            yolo_dir (str, Path): Directory where the logs and model will be temporarily stored (overwriting past runs).
+            device (str, int): The device to run the model on (e.g. cpu, cuda:0, cuda:1, etc.). Either the device name or a number indicating which GPU to use
         """
         self.model_name = model_name
         self.data_yaml = Path(data_yaml)
         self.yolo_dir = Path(yolo_dir)
         self.device = device
 
-        def setup_s3_client():
-            """
-            Creates the mlflow bucket in minio
-            """
-            s3_client = boto3.client(
-                "s3",
-                endpoint_url=os.getenv("MLFLOW_S3_ENDPOINT_URL"),
-                aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-                aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-            )
-            try:
-                s3_client.head_bucket(Bucket="mlflow")
-            except Exception:
-                s3_client.create_bucket(Bucket="mlflow")
-
-        setup_s3_client()
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=config.endpoint_url,
+            aws_access_key_id=config.aws_access_key_id,
+            aws_secret_access_key=config.aws_secret_access_key,
+        )
+        try:
+            s3_client.head_bucket(Bucket="mlflow")
+        except Exception:
+            s3_client.create_bucket(Bucket="mlflow")
 
     def train_model(self) -> None:
         """
@@ -61,6 +54,7 @@ class Trainer:
         with mlflow.start_run(run_name=self.model_name, log_system_metrics=True) as run:
             model = YOLO(model=self.model_name + ".pt")
 
+            # Training + Validation done automatically by ultralytics
             model.train(
                 data=str(self.data_yaml),
                 epochs=config.EPOCHS,
@@ -90,9 +84,7 @@ class Trainer:
         An alias is unique in mlflow. The challenger alias refers to the last challenger. All the challenger models are identified via the "status" tag
         """
         run_id = mlflow.last_active_run().info.run_id
-
         model_version = mlflow.register_model(model_uri=f"runs:/{run_id}/weights/best.pt", name=self.model_name)
-
         client = MlflowClient()
 
         champion_version = None
@@ -122,12 +114,19 @@ class Trainer:
                 console.print("[green]Current model is worse than champion: not setting alias[/]")
 
 
-if __name__ == "__main__":
+def main():
     trainer = Trainer(
         model_name=config.MODEL_NAME,
         data_yaml=Path.cwd() / config.DATA_YAML,
         yolo_dir=Path.cwd() / config.YOLO_DIR_TMP,
         device=config.DEVICE,
     )
+    # PIPELINE ML 4 & 5 : Training + Evaluation
     trainer.train_model()
+
+    # PIPELINE ML 6 : Model Validation
     trainer.register_model()
+
+
+if __name__ == "__main__":
+    main()

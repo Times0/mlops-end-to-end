@@ -25,6 +25,11 @@ class Config:
         self.DEVICE = "cpu"
         self.EPOCHS = 1
 
+        ## minio
+        self.endpoint_url = os.getenv("MLFLOW_S3_ENDPOINT_URL")
+        self.aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+        self.aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+
 
 # why use a class?
 # We can have autocompletion and type checking 👍
