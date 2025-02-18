@@ -47,9 +47,7 @@ def ensure_annotations_present(dataset_path: Path) -> bool:
     return False
 
 
-def ensure_annotations_downloaded(
-    dataset_path: Path, dataset_version: DatasetVersion
-) -> Optional[Path]:
+def ensure_annotations_downloaded(dataset_path: Path, dataset_version: DatasetVersion) -> Optional[Path]:
     """Download annotations if not already present"""
     annotation_file = dataset_path / "annotations.zip"
     if not ensure_annotations_present(dataset_path):
@@ -74,9 +72,7 @@ def extract_annotations(annotation_file: str, dataset_path: Path):
     with zipfile.ZipFile(annotation_file, "r") as zip_ref:
         zip_ref.extractall(temp_dir)
 
-    for txt_file in track(
-        list(temp_dir.rglob("*.txt")), description="Moving annotation files"
-    ):
+    for txt_file in track(list(temp_dir.rglob("*.txt")), description="Moving annotation files"):
         shutil.move(str(txt_file), str(dataset_path / txt_file.name))
 
     shutil.rmtree(temp_dir)
@@ -85,9 +81,7 @@ def extract_annotations(annotation_file: str, dataset_path: Path):
     console.log("[green]Annotation files extracted and organized![/]")
 
 
-def split_dataset(
-    dataset_path: Path, train_ratio: float, valid_ratio: float, seed: int = 42
-):
+def split_dataset(dataset_path: Path, train_ratio: float, valid_ratio: float, seed: int = 42):
     """Split dataset into train and valid sets and creates folders in dataset_path"""
     # Create images and labels folders for each split
     for split in ["train", "valid", "test"]:
@@ -125,17 +119,13 @@ def split_dataset(
     valid_files = image_files[n_train : n_train + n_valid]
     test_files = image_files[n_train + n_valid :]
 
-    def move_files_to_split(
-        files, source_path: Path, target_path: Path, split_name: str
-    ):
+    def move_files_to_split(files, source_path: Path, target_path: Path, split_name: str):
         """Move image files and their corresponding labels to the target split directory"""
         for img_file in track(files, description=f"Moving {split_name} files"):
             img_file = Path(img_file)
             label_file = source_path / f"{img_file.stem}.txt"
             if label_file.exists():
-                shutil.move(
-                    str(label_file), str(target_path / "labels" / label_file.name)
-                )
+                shutil.move(str(label_file), str(target_path / "labels" / label_file.name))
             else:
                 pass
                 # console.log(f"[red]Label file not found for {img_file}[/]")
@@ -178,7 +168,7 @@ def main():
     dataset_version: DatasetVersion = dataset.get_version("initial")
 
     # Downloading
-    ensure_dataset_downloaded(dataset_version, DATASET_PATH)
+    ensure_dataset_downloaded(dataset_version, DATASET_PATH)  # PIPELINE ML : Data extraction
     annotation_file = ensure_annotations_downloaded(DATASET_PATH, dataset_version)
     if annotation_file:
         extract_annotations(annotation_file, DATASET_PATH)
