@@ -36,8 +36,6 @@ class Trainer:
         self.yolo_dir = Path(yolo_dir)
         self.device = device
 
-        os.makedirs(self.yolo_dir, exist_ok=True)
-
         def setup_s3_client():
             """
             Creates the mlflow bucket in minio
