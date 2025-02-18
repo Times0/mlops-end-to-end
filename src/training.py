@@ -1,10 +1,10 @@
-import os
 from pathlib import Path
 import mlflow
 from mlflow import MlflowClient
 from ultralytics import YOLO
 from dotenv import load_dotenv
 from rich.console import Console
+from config import config
 
 load_dotenv()
 KEY_METRIC = "metrics/mAP50-95B"
@@ -35,7 +35,7 @@ class Trainer:
         self.yolo_dir = Path(yolo_dir)
         self.device = device
 
-    def train_model(self, epochs: int) -> None:
+    def train_model(self) -> None:
         """
         Trains the model configured in __init__.
         Logs the results in yolo_dir (unused; you can delete this freely) and in mlflow for latter retrieval.
@@ -48,7 +48,7 @@ class Trainer:
 
             model.train(
                 data=str(self.data_yaml),
-                epochs=epochs,
+                epochs=config.EPOCHS,
                 device=self.device,
                 project=str(self.yolo_dir),  # dir to save runs
                 close_mosaic=0,
@@ -108,13 +108,11 @@ class Trainer:
 
 
 if __name__ == "__main__":
-    data_yaml = Path.cwd() / os.getenv("DATA_YAML", "data/THE-dataset/yolo.yaml")
-    yolo_dir = Path.cwd() / os.getenv("YOLO_DIR_TMP", "tmp/yolo_runs")
-    device = os.getenv("DEVICE", "cpu")
-    epochs = int(os.getenv("EPOCHS", 3))
-    model_name = os.getenv("MODEL", "yolo11n")
-
-    train = Trainer(model_name=model_name, data_yaml=data_yaml, yolo_dir=yolo_dir, device=device)
-
-    train.train_model(epochs)
-    train.register_model()
+    trainer = Trainer(
+        model_name=config.MODEL_NAME,
+        data_yaml=Path.cwd() / config.DATA_YAML,
+        yolo_dir=Path.cwd() / config.YOLO_DIR_TMP,
+        device=config.DEVICE,
+    )
+    trainer.train_model()
+    trainer.register_model()
