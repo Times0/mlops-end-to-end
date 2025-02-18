@@ -197,6 +197,7 @@ def validate_dataset(dataset_path: Path):
         console.log("[green]Dataset validation successful![/]")
     else:
         console.log(f"[red]{errors} errors found in the dataset[/]")
+        raise ValueError("Dataset validation failed")
 
 
 def main():
