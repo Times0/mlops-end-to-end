@@ -26,11 +26,12 @@ start the run in background
 ```
 docker compose up --build -d
 ```
-You can turn down docker with
+(You can turn down docker with the following command once you are done)
 ```
 docker compose down
 ```
 If you want to delete the volumes for a fresh start, use "-v"
+
 
 
 ### Running
@@ -44,6 +45,7 @@ MLFLOW_S3_ENDPOING_URL=http://localhost:9000 uv run src/<file.py>
 
 To serve on bentoml (only for static image inference, not for video or camera use):
 ```
+bentoml cloud login
 bentoml build
 bentoml serve
 ```

@@ -8,6 +8,8 @@ import mlflow
 from mlflow.tracking import MlflowClient
 from ultralytics import YOLO
 from minio import Minio
+import boto3
+import shutil
 
 from config_inference import *
 
@@ -35,6 +37,8 @@ class Inference():
         self.overwrite_model = True
 
         #Setup paths and files
+        #os.rmdir(tmp_dir)
+        shutil.rmtree(tmp_dir)
         os.makedirs(tmp_dir, exist_ok=True)
         os.makedirs(models_dir, exist_ok=True)
 
@@ -51,8 +55,10 @@ class Inference():
             model_path = model_path[5:]
         bucket_name, object_name = model_path.split('/', 1)
 
+        endpoint = os.getenv("MLFLOW_S3_ENDPOINT_URL", "http://localhost:9000")
+        endpoint = endpoint.removeprefix("http://").removeprefix("https://")
         minio_client = Minio(
-            "localhost:9000",
+            endpoint,
             access_key=os.getenv('AWS_ACCESS_KEY_ID'),
             secret_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
             secure=False  #true if https
@@ -79,8 +85,7 @@ class Inference():
                 exit(0)
 
             results = self.model.predict(source, show=True)
-            #print(f"Prediction results: {results}")
-            #save reulsts
+
             for r in results:
                 im_array = r.plot()
                 import cv2
