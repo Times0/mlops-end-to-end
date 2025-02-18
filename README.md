@@ -31,7 +31,7 @@ Welcome to our smart object detection project! 🎉 This was developed as part o
 
 ## 📝 Pipeline ML
 
-All the steps of the MLOps pipeline are independently executed sequentially. The data part is done in (file) and the training part in (file). Comments are provided in the code to highlight the different steps of the pipeline.
+All the steps of the MLOps pipeline are independently executed sequentially. The data part is done in [pipeline_data.py](https://github.com/Times0/mlops-end-to-end/blob/main/src/data_pipeline.py) and the training part in [training_pipeline.py](https://github.com/Times0/mlops-end-to-end/blob/main/src/training_pipeline.py). Comments are provided in the code to highlight the different steps of the pipeline.
 ![alt text](PipelineML.png)
 
 ## 🚀 Getting Started
