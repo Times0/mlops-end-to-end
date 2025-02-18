@@ -1,13 +1,11 @@
 import logging
-import os
-from os import access
-
 import bentoml
 import numpy as np
 from PIL import Image
 
 logger = logging.getLogger("bentoml")
 logger.setLevel(logging.DEBUG)
+
 
 @bentoml.service
 class YOLOService:

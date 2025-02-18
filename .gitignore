@@ -7,3 +7,7 @@ tmp/
 mlruns/
 data/
 *.pt
+.*
+!.gitignore
+!.env.example
+!.pre-commit-config.yaml
