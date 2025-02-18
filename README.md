@@ -1,76 +1,83 @@
-## Object detection fine-tuning pipeline.
+# 🎯 Object Detection Fine-tuning Pipeline
 
-To run this project you need to have docker and docker compose installed.
+A Docker-based pipeline for object detection model fine-tuning and deployment.
 
-### Preparation
+## 🚀 Getting Started
 
-Set up the python environment
+### Prerequisites
+- Docker 🐳
 
+### 🛠️ Environment Setup
+
+1. Set up the Python environment:
 ```shell
 pip install uv
 uv venv --python=3.11
 uv pip install -r requirements.txt
-source .venv/bin/activate  # On windows, use .venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-We use docker to compartementalize the pieces of the pipeline.
-Check if docker is running
-
-```
+2. 🐳 Docker Setup
+Check Docker status:
+```shell
 systemctl status docker
 ```
 
-If docker is not running, start it with:
-
-```
+If Docker isn't running:
+```shell
 systemctl start docker
 ```
 
-start the run in background
-
-```
+3. 🚀 Launch the Pipeline
+Start services in background:
+```shell
 docker compose up --build -d
 ```
 
-You can turn down docker with
-
-```
+To stop the services:
+```shell
 docker compose down
 ```
 
-If you want to delete the volumes for a fresh start, use "-v"
+💡 Tip: Use `-v` flag with `down` command to remove volumes for a fresh start
 
-### Running
+## 🏃‍♂️ Running the Pipeline
 
-run dataset_preparation, training and inference_local in that order
+Follow these steps in order:
+1. Dataset Preparation
+2. Training
+3. Local Inference
 
-If you have vscode, you can launch them in the run section.
-If you are using a terminal, you must overload the MLFLOW_S3_ENDPOINT_URL environment, that is because the docker uses a different port.
+### 🖥️ Running Options
 
-For example, like this on linux
+#### VSCode
+Launch directly from the Run section in VSCode
 
+#### Terminal
+Set the MLFLOW endpoint URL before running:
+
+Linux:
 ```shell
 MLFLOW_S3_ENDPOING_URL=http://localhost:9000 uv run src/<file.py>
 ```
 
-or like this on windows
-
+Windows:
 ```powershell
 $env:MLFLOW_S3_ENDPOINT_URL="http://localhost:9000"; uv run src/<file.py>
 ```
 
-To serve on bentoml (only for static image inference, not for video or camera use):
+### 🚀 Deployment
 
+To serve models with BentoML (static image inference only):
 ```shell
 bentoml build
 bentoml serve
 ```
 
-You can then use the inference_bento (update the endpoint url) to test it.
+Test the deployment using `inference_bento` (remember to update the endpoint URL).
 
-TODO:
-refactor
-create bucket automatically on s3
-docstring
-clean readme
-report
+## 📝 TODO
+- [ ] Refactor code
+- [ ] Implement automatic S3 bucket creation
+- [ ] Add docstrings
+- [*] Clean up README
