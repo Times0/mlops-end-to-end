@@ -13,8 +13,8 @@ services:
   minio:
     image: minio/minio:latest
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio_data:/data
     entrypoint: [ "minio", "server", "--console-address", "0.0.0.0:9001", "/data" ]

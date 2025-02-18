@@ -1,7 +1,9 @@
 __pycache__/
 .venv/
+src/__pycache__
+
+
+tmp/
 mlruns/
 data/
 *.pt
-models/
-src/yolo_runs/

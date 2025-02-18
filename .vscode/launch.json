@@ -2,7 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Start training.py",
+            "name": "py: Start data_preparation.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dataset_preparation.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/src/config/.env",
+            "python": "${workspaceFolder}/.venv/bin/python"
+        },
+        {
+            "name": "py: Start training.py",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/training.py",
@@ -15,17 +25,17 @@
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
-            "name": "Python: Start inference_bento.py",
+            "name": "py: Start inference_bento.py",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/inference_bento.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "envFile": "${workspaceFolder}/src/config/.env", //no need to overload the mlflow s3 endpoint here
+            "envFile": "${workspaceFolder}/src/config/.env",
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
-            "name": "Python: Start inference_local.py",
+            "name": "py: Start inference_local.py",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/inference_local.py",
@@ -38,7 +48,7 @@
             "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
-            "name": "Python: Start inference_test.py",
+            "name": "py: Start inference_test.py",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/inference_test.py",
