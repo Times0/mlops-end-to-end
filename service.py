@@ -28,7 +28,7 @@ class YOLOService:
         os.makedirs(tmp_dir, exist_ok=True)
         os.makedirs(models_dir, exist_ok=True)
 
-    def load_model(self):
+    def load_model(self)->None:
         """Load the YOLO model using MLflow"""
         from ultralytics import YOLO    
 
