@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.progress import track
 import yaml
 import random
-from config import config
+from src.config import config
 from typing import Optional
 
 
@@ -139,13 +139,13 @@ def split_dataset(dataset_path: Path, train_ratio: float, valid_ratio: float, se
     console.log("[green]Dataset split complete![/]")
 
 
-def create_yaml_yolo(dataset_path: Path, classes: list):
+def create_yaml_yolo(dataset_path: Path, classes: list[str]):
     """Create yaml file for yolo training"""
     console.log("[yellow]Creating yaml file for yolo training...[/]")
     yaml_path = dataset_path / "yolo.yaml"
 
     # Create dict mapping index to class name
-    names_dict = {i: name.name for i, name in enumerate(classes)}
+    names_dict = {i: name for i, name in enumerate(classes)}
 
     # Create yaml config dict
     yaml_config = {
@@ -220,7 +220,8 @@ def main():
     # PIPELINE ML 2 : Data preparation
     split_dataset(DATASET_PATH, 0.6, 0.2)  # 60% train, 20% valid, 20% test
     classes = dataset_version.list_labels()
-    create_yaml_yolo(DATASET_PATH, classes)
+    class_names = [label.name for label in classes]
+    create_yaml_yolo(DATASET_PATH, class_names)
 
     # PIPELINE ML 3 : Data validation
     validate_dataset(DATASET_PATH)

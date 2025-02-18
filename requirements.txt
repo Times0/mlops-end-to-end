@@ -12,3 +12,4 @@ pymysql
 bentoml
 minio
 boto3
+pytest
