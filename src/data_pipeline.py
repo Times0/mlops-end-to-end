@@ -15,6 +15,7 @@ from typing import Optional
 DATASET_PATH = Path(r"data/THE-dataset")
 console = Console()
 
+# Login to Picsellia
 client = Client(
     api_token=config.api_token,
     organization_name=config.ORG_NAME,
@@ -46,9 +47,7 @@ def ensure_annotations_present(dataset_path: Path) -> bool:
     return False
 
 
-def ensure_annotations_downloaded(
-    dataset_path: Path, dataset_version: DatasetVersion
-) -> Optional[Path]:
+def ensure_annotations_downloaded(dataset_path: Path, dataset_version: DatasetVersion) -> Optional[Path]:
     """Download annotations if not already present"""
     annotation_file = dataset_path / "annotations.zip"
     if not ensure_annotations_present(dataset_path):
@@ -73,9 +72,7 @@ def extract_annotations(annotation_file: str, dataset_path: Path):
     with zipfile.ZipFile(annotation_file, "r") as zip_ref:
         zip_ref.extractall(temp_dir)
 
-    for txt_file in track(
-        list(temp_dir.rglob("*.txt")), description="Moving annotation files"
-    ):
+    for txt_file in track(list(temp_dir.rglob("*.txt")), description="Moving annotation files"):
         shutil.move(str(txt_file), str(dataset_path / txt_file.name))
 
     shutil.rmtree(temp_dir)
@@ -84,9 +81,7 @@ def extract_annotations(annotation_file: str, dataset_path: Path):
     console.log("[green]Annotation files extracted and organized![/]")
 
 
-def split_dataset(
-    dataset_path: Path, train_ratio: float, valid_ratio: float, seed: int = 42
-):
+def split_dataset(dataset_path: Path, train_ratio: float, valid_ratio: float, seed: int = 42):
     """Split dataset into train and valid sets and creates folders in dataset_path"""
     # Create images and labels folders for each split
     for split in ["train", "valid", "test"]:
@@ -124,17 +119,13 @@ def split_dataset(
     valid_files = image_files[n_train : n_train + n_valid]
     test_files = image_files[n_train + n_valid :]
 
-    def move_files_to_split(
-        files, source_path: Path, target_path: Path, split_name: str
-    ):
+    def move_files_to_split(files, source_path: Path, target_path: Path, split_name: str):
         """Move image files and their corresponding labels to the target split directory"""
         for img_file in track(files, description=f"Moving {split_name} files"):
             img_file = Path(img_file)
             label_file = source_path / f"{img_file.stem}.txt"
             if label_file.exists():
-                shutil.move(
-                    str(label_file), str(target_path / "labels" / label_file.name)
-                )
+                shutil.move(str(label_file), str(target_path / "labels" / label_file.name))
             else:
                 pass
                 # console.log(f"[red]Label file not found for {img_file}[/]")
@@ -171,22 +162,68 @@ def create_yaml_yolo(dataset_path: Path, classes: list):
     console.log("[green]YAML file created![/]")
 
 
+def validate_dataset(dataset_path: Path):
+    """Validation part of the pipeline, checking if :
+    - The dataset is correctly structured (images and labels folders)
+    - Each image has a corresponding label file
+    - The labels are correctly formatted
+    """
+    console.log("[yellow]Validating dataset...[/]")
+    errors = 0
+    warnings = 0
+    for split in ["train", "valid", "test"]:
+        images_path = dataset_path / split / "images"
+        labels_path = dataset_path / split / "labels"
+
+        # Check if images and labels folders exist
+        if not images_path.exists() or not labels_path.exists():
+            console.log(f"[red]Images or labels folder not found for {split} split[/]")
+            errors += 1
+            continue
+
+        # Check if each image has a corresponding label file
+        images = set(img.stem for img in images_path.glob("*.jpg"))
+        labels = set(label.stem for label in labels_path.glob("*.txt"))
+        missing_labels = images - labels
+        if missing_labels:
+            console.log(f"[yellow](warning) {len(missing_labels)} images are missing label files in {split} split[/]")
+            warnings += len(missing_labels)
+
+        # Check if labels are correctly formatted
+        for label_file in labels_path.glob("*.txt"):
+            with open(label_file, "r") as f:
+                lines = f.readlines()
+            for line in lines:
+                parts = line.strip().split()
+                if len(parts) != 5:
+                    console.log(f"[red]Incorrect format in {label_file.name}[/]")
+                    errors += 1
+                    break
+
+    if errors == 0:
+        console.log("[green]Dataset validation successful![/]")
+    else:
+        console.log(f"[red]{errors} errors found in the dataset[/]")
+
+
 def main():
-    console.log("[bold blue]Starting dataset preparation...[/]")
-    print(client.list_datasets())
+    console.log("[bold blue]Starting data pipeline...[/]")
     dataset: Dataset = client.get_dataset_by_id(config.DATASET_ID)
     dataset_version: DatasetVersion = dataset.get_version("initial")
 
-    # Downloading
+    # PIPELINE ML 1 : Data extraction
     ensure_dataset_downloaded(dataset_version, DATASET_PATH)
     annotation_file = ensure_annotations_downloaded(DATASET_PATH, dataset_version)
     if annotation_file:
         extract_annotations(annotation_file, DATASET_PATH)
 
-    # Preprocessing
-    split_dataset(DATASET_PATH, 0.6, 0.2)
+    # PIPELINE ML 2 : Data preparation
+    split_dataset(DATASET_PATH, 0.6, 0.2)  # 60% train, 20% valid, 20% test
     classes = dataset_version.list_labels()
     create_yaml_yolo(DATASET_PATH, classes)
+
+    # PIPELINE ML 3 : Data validation
+    validate_dataset(DATASET_PATH)
 
 
 if __name__ == "__main__":

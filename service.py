@@ -16,6 +16,7 @@ tmp_dir = os.path.join(os.getcwd(), "tmp")
 models_dir = os.path.join(tmp_dir, "models")
 local_model_path = os.path.join(models_dir, "best.pt")
 
+
 @bentoml.service
 class YOLOService:
     def __init__(self) -> None:
