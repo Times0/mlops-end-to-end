@@ -11,3 +11,4 @@ data/
 !.gitignore
 !.env.example
 !.pre-commit-config.yaml
+!.github
