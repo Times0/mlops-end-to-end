@@ -15,13 +15,6 @@ from src.config import config
 DATASET_PATH = Path(r"data/THE-dataset")
 console = Console()
 
-# Login to Picsellia
-client = Client(
-    api_token=config.api_token,
-    organization_name=config.ORG_NAME,
-    host=config.HOST,
-)
-
 
 def ensure_dataset_downloaded(dataset_version: DatasetVersion, dataset_path: Path):
     """Download dataset if not already present"""
@@ -207,6 +200,12 @@ def validate_dataset(dataset_path: Path):
 
 
 def main():
+    client = Client(
+        api_token=config.api_token,
+        organization_name=config.ORG_NAME,
+        host=config.HOST,
+    )
+
     console.log("[bold blue]Starting data pipeline...[/]")
     dataset: Dataset = client.get_dataset_by_id(config.DATASET_ID)
     dataset_version: DatasetVersion = dataset.get_version("initial")

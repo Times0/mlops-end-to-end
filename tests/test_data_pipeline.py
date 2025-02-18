@@ -85,13 +85,16 @@ def test_validate_dataset(temp_dataset_path):
     # First split the dataset
     split_dataset(temp_dataset_path, 0.6, 0.2)
 
-    # Should pass validation
+    # Should pass validation without raising exception
     validate_dataset(temp_dataset_path)
 
-    # Create an invalid label file to test validation
+    # Create an invalid label file with corresponding image
     invalid_label_path = temp_dataset_path / "train" / "labels" / "invalid.txt"
+    invalid_image_path = temp_dataset_path / "train" / "images" / "invalid.jpg"
+    invalid_image_path.touch()
     with open(invalid_label_path, "w") as f:
         f.write("invalid format")  # Wrong format
 
-    # Should detect the invalid format
-    validate_dataset(temp_dataset_path)
+    # Should raise ValueError for invalid format
+    with pytest.raises(ValueError):
+        validate_dataset(temp_dataset_path)
