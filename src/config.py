@@ -1,7 +1,8 @@
 import os
 import dotenv
 
-dotenv.load_dotenv()
+if not dotenv.load_dotenv():
+    print("Failed to load .env file")
 
 
 class Config:
@@ -9,7 +10,7 @@ class Config:
         # Get environment variables with fallback error if not set
         self.api_token = os.environ.get("PICSELIA_API_TOKEN")
         if not self.api_token:
-            raise ValueError("PICSELIA_API_TOKEN environment variable is not set")
+            print("PICSELIA_API_TOKEN environment variable is not set")
 
         # Pipeline Data
         self.ORG_NAME = "Picsalex-MLOps"
