@@ -59,9 +59,6 @@ class Trainer:
         """
         Trains the model configured in __init__.
         Logs the results in yolo_dir (unused; you can delete this freely) and in mlflow for latter retrieval.
-
-        Args:
-            epochs (int): The number of epochs of training.
         """
         with mlflow.start_run(run_name=self.model_name, log_system_metrics=True) as run:
             model = YOLO(model=self.model_name + ".pt")
