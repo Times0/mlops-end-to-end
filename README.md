@@ -80,4 +80,4 @@ Test the deployment using `inference_bento` (remember to update the endpoint URL
 - [ ] Refactor code
 - [ ] Implement automatic S3 bucket creation
 - [ ] Add docstrings
-- [*] Clean up README
+- [x] Clean up README
